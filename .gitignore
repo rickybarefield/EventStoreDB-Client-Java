@@ -1,3 +1,8 @@
+#TODO - RB Added and remove before squash / PR
+.idea
+db-client-java/build/
+
+
 # Created by .ignore support plugin (hsz.mobi)
 ### Gradle template
 .gradle

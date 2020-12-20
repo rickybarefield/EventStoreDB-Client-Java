@@ -36,6 +36,7 @@ public class EventStoreTestDBContainer extends GenericContainer<EventStoreTestDB
 
         addExposedPorts(1113, 2113);
 
+        withEnv("EVENTSTORE_RUN_PROJECTIONS", "ALL");
         withEnv("EVENTSTORE_INSECURE", "true");
         if (!emptyDatabase) {
             withEnv("EVENTSTORE_MEM_DB", "false");
@@ -60,5 +61,10 @@ public class EventStoreTestDBContainer extends GenericContainer<EventStoreTestDB
 
     public PersistentSubscriptions getPersistentSubscriptionsAPI() {
         return getClient().persistentSubscriptions();
+    }
+
+    public Projections getProjectionManagementAPI() {
+
+        return getClient().projections();
     }
 }
