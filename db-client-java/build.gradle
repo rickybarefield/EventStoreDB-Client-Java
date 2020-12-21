@@ -34,6 +34,7 @@ dependencies {
     implementation "javax.validation:validation-api:${validationApiVersion}"
 
     implementation "com.google.protobuf:protobuf-java:${protobufVersion}"
+    implementation "com.google.protobuf:protobuf-java-util:${protobufVersion}"
     implementation "io.grpc:grpc-netty-shaded:${grpcVersion}"
     implementation "io.grpc:grpc-stub:${grpcVersion}"
     implementation "io.grpc:grpc-protobuf:${grpcVersion}"
@@ -115,11 +116,11 @@ publishing {
     }
 }
 
-signing {
-    useGpgCmd()
-    sign configurations.archives
-    sign publishing.publications.mavenJava
-}
+//signing {
+//    useGpgCmd()
+//    sign configurations.archives
+//    sign publishing.publications.mavenJava
+//}
 
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8

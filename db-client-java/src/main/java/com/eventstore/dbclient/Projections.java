@@ -15,4 +15,9 @@ public class Projections {
 
         return CreateProjection.forContinuous(this.client, this.credentials, projectionName, query, trackEmittedStreams);
     }
+
+    public <TResult> GetProjectionResult<TResult> getResult(final String projectionName, Class<TResult> type) {
+
+        return new GetProjectionResult<>(this.client, this.credentials, projectionName, type);
+    }
 }
