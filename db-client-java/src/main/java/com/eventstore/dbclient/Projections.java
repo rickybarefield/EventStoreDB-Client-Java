@@ -1,5 +1,10 @@
 package com.eventstore.dbclient;
 
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.type.TypeFactory;
+
+import java.util.function.Function;
+
 public class Projections {
 
     private GrpcClient client;
@@ -20,4 +25,11 @@ public class Projections {
 
         return new GetProjectionResult<>(this.client, this.credentials, projectionName, type);
     }
+
+    public <TResult> GetProjectionResult<TResult> getResult(final String projectionName,
+                                                            Function<TypeFactory, JavaType> javaTypeFunction) {
+
+        return new GetProjectionResult<>(this.client, this.credentials, projectionName, javaTypeFunction);
+    }
+
 }

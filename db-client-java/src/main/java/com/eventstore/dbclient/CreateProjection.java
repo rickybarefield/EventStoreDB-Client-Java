@@ -66,7 +66,7 @@ public class CreateProjection {
 
             CompletableFuture result = new CompletableFuture();
 
-            client.create(request, GrpcUtils.convertSingleResponse(result, Function.identity()));
+            client.create(request, GrpcUtils.convertSingleResponse(result));
 
             return result;
         });

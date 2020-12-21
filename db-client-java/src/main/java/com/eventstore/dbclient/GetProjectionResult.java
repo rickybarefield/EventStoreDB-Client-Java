@@ -3,9 +3,9 @@ package com.eventstore.dbclient;
 import com.eventstore.dbclient.proto.projections.Projectionmanagement;
 import com.eventstore.dbclient.proto.projections.ProjectionsGrpc;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.json.JsonMapper;
-import com.google.protobuf.InvalidProtocolBufferException;
+import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.google.protobuf.util.JsonFormat;
 import io.grpc.Metadata;
 import io.grpc.stub.MetadataUtils;
@@ -17,16 +17,32 @@ public class GetProjectionResult<TResult> {
 
     private final GrpcClient client;
     private final String projectionName;
-    private Class<TResult> resultType;
 
     private final ConnectionMetadata metadata;
+
+    private ThrowingBiFunction<JsonMapper, String, TResult, JsonProcessingException> deserializationStrategy;
 
     public GetProjectionResult(final GrpcClient client, final UserCredentials credentials,
                                final String projectionName, Class<TResult> resultType) {
 
+        this(client, credentials, projectionName);
+        deserializationStrategy = ((jsonMapper, json) -> jsonMapper.readValue(json, resultType));
+    }
+
+    public GetProjectionResult(final GrpcClient client, final UserCredentials credentials,
+                               final String projectionName,
+                               Function<TypeFactory, JavaType> javaTypeFunction) {
+
+        this(client, credentials, projectionName);
+        deserializationStrategy = ((jsonMapper, json)
+                -> jsonMapper.readValue(json, javaTypeFunction.apply(jsonMapper.getTypeFactory())));
+    }
+
+    private GetProjectionResult(final GrpcClient client, final UserCredentials credentials,
+                               final String projectionName) {
+
         this.client = client;
         this.projectionName = projectionName;
-        this.resultType = resultType;
 
         this.metadata = new ConnectionMetadata();
 
@@ -34,6 +50,7 @@ public class GetProjectionResult<TResult> {
             this.metadata.authenticated(credentials);
         }
     }
+
 
     public GetProjectionResult authenticated(UserCredentials credentials) {
         this.metadata.authenticated(credentials);
@@ -59,27 +76,15 @@ public class GetProjectionResult<TResult> {
 
             CompletableFuture<TResult> result = new CompletableFuture<>();
 
-            Function<Projectionmanagement.ResultResp, TResult> converter = source -> {
+            ThrowingFunction<Projectionmanagement.ResultResp, TResult, Exception> converter = source -> {
 
-                try {
-                    String json = JsonFormat.printer().print(source.getResult());
-                    return new JsonMapper().readValue(json, resultType);
-                }
-                catch (InvalidProtocolBufferException e) {
-                    throw new RuntimeException(e);
-                }
-                catch (JsonMappingException e) {
-                    throw new RuntimeException(e);
-                }
-                catch (JsonProcessingException e) {
-                    throw new RuntimeException(e);
-                }
+                String json = JsonFormat.printer().print(source.getResult());
+                return deserializationStrategy.apply(new JsonMapper(), json);
             };
 
             client.result(request, GrpcUtils.convertSingleResponse(result, converter));
 
             return result;
-
         });
     }
 }
