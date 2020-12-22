@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 public class ProjectionManagementTests {
 
     @Rule
-    public final EventStoreTestDBContainer server = new EventStoreTestDBContainer(false);
+    public final EventStoreTestDBContainer server = new EventStoreTestDBContainer(false, true);
 
     private static final String PROJECTION_NAME = "projection";
 

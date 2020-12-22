@@ -31,12 +31,23 @@ public class EventStoreTestDBContainer extends GenericContainer<EventStoreTestDB
         this(IMAGE + ":" + IMAGE_TAG, emptyDatabase);
     }
 
+    public EventStoreTestDBContainer(boolean emptyDatabase, boolean runProjections) {
+        this(IMAGE + ":" + IMAGE_TAG, emptyDatabase, runProjections);
+    }
+
     public EventStoreTestDBContainer(String image, boolean emptyDatabase) {
+        this(image, emptyDatabase, false);
+    }
+
+    public EventStoreTestDBContainer(String image, boolean emptyDatabase, boolean runProjections) {
         super(image);
 
         addExposedPorts(1113, 2113);
 
-        withEnv("EVENTSTORE_RUN_PROJECTIONS", "ALL");
+        if(runProjections) {
+            withEnv("EVENTSTORE_RUN_PROJECTIONS", "ALL");
+        }
+
         withEnv("EVENTSTORE_INSECURE", "true");
         if (!emptyDatabase) {
             withEnv("EVENTSTORE_MEM_DB", "false");
