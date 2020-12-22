@@ -22,14 +22,14 @@ public class GetProjectionResult<TResult> {
 
     private ThrowingBiFunction<JsonMapper, String, TResult, JsonProcessingException> deserializationStrategy;
 
-    public GetProjectionResult(final GrpcClient client, final UserCredentials credentials,
+    GetProjectionResult(final GrpcClient client, final UserCredentials credentials,
                                final String projectionName, Class<TResult> resultType) {
 
         this(client, credentials, projectionName);
         deserializationStrategy = ((jsonMapper, json) -> jsonMapper.readValue(json, resultType));
     }
 
-    public GetProjectionResult(final GrpcClient client, final UserCredentials credentials,
+    GetProjectionResult(final GrpcClient client, final UserCredentials credentials,
                                final String projectionName,
                                Function<TypeFactory, JavaType> javaTypeFunction) {
 

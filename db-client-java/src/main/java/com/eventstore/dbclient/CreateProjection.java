@@ -7,7 +7,6 @@ import io.grpc.Metadata;
 import io.grpc.stub.MetadataUtils;
 
 import java.util.concurrent.CompletableFuture;
-import java.util.function.Function;
 
 public class CreateProjection {
 
@@ -34,7 +33,7 @@ public class CreateProjection {
         }
     }
 
-    public static CreateProjection forContinuous(final GrpcClient client, final UserCredentials credentials,
+    static CreateProjection forContinuous(final GrpcClient client, final UserCredentials credentials,
                                                  final String projectionName, final String query,
                                                  final boolean trackEmittedStreams) {
 
@@ -64,7 +63,7 @@ public class CreateProjection {
 
             ProjectionsGrpc.ProjectionsStub client = MetadataUtils.attachHeaders(ProjectionsGrpc.newStub(channel), headers);
 
-            CompletableFuture result = new CompletableFuture();
+            CompletableFuture<Projectionmanagement.CreateResp> result = new CompletableFuture<>();
 
             client.create(request, GrpcUtils.convertSingleResponse(result));
 
